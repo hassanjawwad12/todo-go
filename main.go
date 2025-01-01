@@ -19,16 +19,19 @@ var todos = []Todo{
 	{Id: "3", Note: "Read a book by Dostoevsky"},
 }
 
+// Context contains the information about the http request
 func GetTodos(context *gin.Context) {
+
+	// The server only accepts JSON so we  Transform the data into the JSON
+	context.IndentedJSON(http.StatusOK, todos)
 
 }
 
 func main() {
 
+	fmt.Println("Welcome to TODO APP")
 	router := gin.Default()
-	router.GET("/todos")
+	router.GET("/todos", GetTodos)
 	router.Run("localhost:8080") // Run our server
-
-	// The server only accepts JSON
 
 }
