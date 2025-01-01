@@ -69,6 +69,28 @@ func GetTodo(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, todo)
 }
 
+func DeleteTodo(context *gin.Context) {
+
+	id := context.Param("id")
+
+	index := -1
+	for i, todo := range todos {
+		if todo.Id == id {
+			index = i
+			break
+		}
+	}
+
+	if index == -1 {
+		context.IndentedJSON(http.StatusNotFound, gin.H{"message": "Todo not found"})
+		return
+	}
+
+	// Remove the todo from the array
+	todos = append(todos[:index], todos[index+1:]...)
+
+	context.IndentedJSON(http.StatusOK, gin.H{"message": "Todo deleted successfully"})
+}
 func main() {
 
 	fmt.Println("Welcome to TODO APP")
@@ -76,6 +98,7 @@ func main() {
 	router.GET("/todos", GetTodos)
 	router.GET("/todos/:id", GetTodo)
 	router.POST("/todos", AddTodo)
+	router.DELETE("/todos/:id", DeleteTodo)
 	router.Run("localhost:8080") // Run our server
 
 }
