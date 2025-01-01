@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -44,11 +45,36 @@ func AddTodo(context *gin.Context) {
 	context.IndentedJSON(http.StatusCreated, newTodo)
 }
 
+func GetbyId(id string) (*Todo, error) {
+
+	// Iterate over the todo to find the one with the requested id
+	for i, t := range todos {
+		if t.Id == id {
+			return &todos[i], nil
+		}
+	}
+	return nil, errors.New("no todo exist against this id")
+}
+
+func GetTodo(context *gin.Context) {
+
+	// Get the id from the param
+	id := context.Param("id")
+
+	todo, err := GetbyId(id)
+	if err != nil {
+		context.IndentedJSON(http.StatusNotFound, gin.H{"message": "id not found"})
+	}
+
+	context.IndentedJSON(http.StatusOK, todo)
+}
+
 func main() {
 
 	fmt.Println("Welcome to TODO APP")
 	router := gin.Default()
 	router.GET("/todos", GetTodos)
+	router.GET("/todos/:id", GetTodo)
 	router.POST("/todos", AddTodo)
 	router.Run("localhost:8080") // Run our server
 
